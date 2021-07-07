@@ -1,5 +1,6 @@
 const express = require('express');
 const Sequelize = require('sequelize');
+const _USERS = require('./users.json');
 
 const app = express();
 const port = 8001;
@@ -12,30 +13,23 @@ const connection = new Sequelize('db', 'user', 'pass', {
 });
 
 // User model
-const User = connection.define(
-  'User',
-  {
-    // uses a "custom" primary key, e.g 33d5e730-0368-4f29-8fff-afaf7d31b892
-    uuid: {
-      type: Sequelize.UUID,
-      primaryKey: true,
-      defaultValue: Sequelize.UUIDV4,
+const User = connection.define('User', {
+  name: Sequelize.STRING,
+  email: {
+    type: Sequelize.STRING,
+    validate: {
+      // built-in validator
+      isEmail: true,
     },
-    name: {
-      type: Sequelize.STRING,
-      validate: {
-        len: {
-          args: [3],
-          msg: 'Name must be 3 characters or more in length.',
-        },
-      },
-    },
-    bio: Sequelize.TEXT,
   },
-  {
-    timestamps: false,
-  }
-);
+  password: {
+    type: Sequelize.STRING,
+    validate: {
+      // built in validator
+      isAlphanumeric: true,
+    },
+  },
+});
 
 app.get('/', (req, res) => {
   User.create({
@@ -56,15 +50,18 @@ app.get('/', (req, res) => {
 */
 connection
   .sync({
-    logging: console.log,
+    // logging: console.log,
     force: true, // drops the table
   })
   // adds new row of data
   .then(() => {
-    User.create({
-      name: 'Dan',
-      bio: 'New bio entry',
-    });
+    User.bulkCreate(_USERS)
+      .then((users) => {
+        console.log('Successfully added users.');
+      })
+      .error((err) => {
+        console.log(err);
+      });
   })
   .then(() => {
     console.log('Connected to DB');
