@@ -43,6 +43,47 @@ app.post('/users', (req, res) => {
     });
 });
 
+app.put('/users/:id', (req, res) => {
+  User.update(
+    {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+    },
+    {
+      where: {
+        id: req.params.id,
+      },
+    }
+  )
+    .then((rows) => {
+      res.json(rows);
+    })
+    .catch((err) => {
+      res.status(404).send(err.message);
+    });
+});
+
+app.patch('/users/:id', (req, res) => {
+  user = {};
+
+  Object.keys(req.body).forEach((key) => {
+    user[key] = req.body[key];
+  });
+
+  User.update(user, {
+    where: {
+      id: req.params.id,
+    },
+  })
+    .then((rows) => {
+      res.json(rows);
+    })
+    .catch((err) => {
+      res.status(404).send(err.message);
+    });
+});
+
 app.listen(port, () => {
   console.log('Listening on port ' + port);
 });
