@@ -1,5 +1,5 @@
 const express = require('express');
-const _USERS = require('./users.json');
+const _USERS = require('./json/users.json');
 const User = require('./models/User');
 const app = express();
 const port = 8001;
