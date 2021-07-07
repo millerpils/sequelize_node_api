@@ -16,7 +16,6 @@ connection
     logging: console.log,
     // force: true, // drops the table
   })
-  // adds new row of data
   .then(() => {
     // User.bulkCreate(_USERS)
     //   .then((users) => {
