@@ -5,6 +5,9 @@ const _USERS = require('./users.json');
 const app = express();
 const port = 8001;
 
+// pass req.body
+app.use(express.json());
+
 // connects to the db on localhost but saves it to project dir?
 const connection = new Sequelize('db', 'user', 'pass', {
   host: 'localhost',
@@ -32,9 +35,24 @@ const User = connection.define('User', {
 });
 
 app.get('/', (req, res) => {
+  User.findOne({
+    where: { email: req.body.email },
+  })
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => {
+      res.status(404).send(err.message);
+    });
+});
+
+app.post('/', (req, res) => {
+  console.log(req.body);
+
   User.create({
-    name: 'DM',
-    bio: 'New bio entry',
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
   })
     .then((user) => {
       res.json(user);
@@ -50,7 +68,7 @@ app.get('/', (req, res) => {
 */
 connection
   .sync({
-    // logging: console.log,
+    logging: console.log,
     force: true, // drops the table
   })
   // adds new row of data
