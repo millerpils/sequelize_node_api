@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 
-// connects to the db on localhost but saves it to project dir?
+// connects to the db on localhost
 const connection = new Sequelize('db', 'user', 'pass', {
   host: 'localhost',
   dialect: 'sqlite',
@@ -17,13 +17,15 @@ connection
     // force: true, // drops the table
   })
   .then(() => {
-    // User.bulkCreate(_USERS)
-    //   .then((users) => {
-    //     console.log('Successfully added users.');
-    //   })
-    //   .error((err) => {
-    //     console.log(err);
-    //   });
+    /*
+    User.bulkCreate(_USERS)
+      .then((users) => {
+        console.log('Successfully added users.');
+      })
+      .error((err) => {
+        console.log(err);
+      });
+      */
   })
   .then(() => {
     console.log('Connected to DB');

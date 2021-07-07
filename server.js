@@ -7,28 +7,7 @@ const port = 8001;
 // pass req.body
 app.use(express.json());
 
-app.get('/users/:id', (req, res) => {
-  User.findOne({
-    where: { id: req.params.id },
-  })
-    .then((user) => {
-      res.json(user);
-    })
-    .catch((err) => {
-      res.status(404).send(err.message);
-    });
-});
-
-app.get('/users', (req, res) => {
-  User.findAll()
-    .then((user) => {
-      res.json(user);
-    })
-    .catch((err) => {
-      res.status(404).send(err.message);
-    });
-});
-
+// CREATE
 app.post('/users', (req, res) => {
   User.create({
     name: req.body.name,
@@ -43,6 +22,31 @@ app.post('/users', (req, res) => {
     });
 });
 
+// READ
+app.get('/users', (req, res) => {
+  User.findAll()
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => {
+      res.status(404).send(err.message);
+    });
+});
+
+// READ
+app.get('/users/:id', (req, res) => {
+  User.findOne({
+    where: { id: req.params.id },
+  })
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => {
+      res.status(404).send(err.message);
+    });
+});
+
+// UPDATE
 app.put('/users/:id', (req, res) => {
   User.update(
     {
@@ -64,6 +68,7 @@ app.put('/users/:id', (req, res) => {
     });
 });
 
+// UPDATE
 app.patch('/users/:id', (req, res) => {
   user = {};
 
@@ -81,6 +86,19 @@ app.patch('/users/:id', (req, res) => {
     })
     .catch((err) => {
       res.status(404).send(err.message);
+    });
+});
+
+// DELETE
+app.delete('/users/:id', (req, res) => {
+  User.destroy({
+    where: { id: req.params.id },
+  })
+    .then(() => {
+      res.send('User deleted.');
+    })
+    .catch((err) => {
+      res.send(404).send(err.message);
     });
 });
 
