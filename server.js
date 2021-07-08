@@ -15,7 +15,7 @@ app.use(express.json());
 connection
   .sync({
     // logging: console.log,
-    // force: true, // drops the table
+    //force: true, // drops the table
   })
   .then(() => {
     // User.bulkCreate(_USERS)
@@ -54,7 +54,27 @@ const Post = connection.define('Post', {
   content: Sequelize.TEXT,
 });
 
+const Comment = connection.define('Comment', {
+  comment: Sequelize.STRING,
+});
+
+// one-to-one relationship - foreign key UserId gets added to post table
 Post.belongsTo(User);
+
+// one-to-one relationship
+Comment.belongsTo(Post);
+
+// one-to-one relationship
+Comment.belongsTo(User);
+
+// one-to-many relationship - Posts array with UserId added to found user
+User.hasMany(Post);
+
+// one-to-many relationship - Posts array with UserId added to found user
+User.hasMany(Comment);
+
+// one-to-many relationship - Posts array with UserId added to found user
+Post.hasMany(Comment); // alias can be added
 
 /*
   USERS
@@ -77,7 +97,9 @@ app.post('/users', (req, res) => {
 
 // READ
 app.get('/users', (req, res) => {
-  User.findAll()
+  User.findAll({
+    include: [Post, Comment],
+  })
     .then((user) => {
       res.json(user);
     })
@@ -90,6 +112,7 @@ app.get('/users', (req, res) => {
 app.get('/users/:id', (req, res) => {
   User.findOne({
     where: { id: req.params.id },
+    include: [Comment],
   })
     .then((user) => {
       res.json(user);
@@ -162,7 +185,7 @@ app.delete('/users/:id', (req, res) => {
 // CREATE
 app.post('/posts', (req, res) => {
   Post.create({
-    UserId: req.body.UserId,
+    UserId: req.body.userid,
     title: req.body.title,
     content: req.body.content,
   })
@@ -177,10 +200,56 @@ app.post('/posts', (req, res) => {
 // READ
 app.get('/posts', (req, res) => {
   Post.findAll({
-    include: [User],
+    include: [Comment],
   })
     .then((post) => {
       res.json(post);
+    })
+    .catch((err) => {
+      res.status(404).send(err.message);
+    });
+});
+
+/*
+  COMMENTS
+*/
+
+// CREATE
+app.post('/comments', (req, res) => {
+  Comment.create({
+    PostId: req.body.postid,
+    UserId: req.body.userid,
+    comment: req.body.comment,
+  })
+    .then((comment) => {
+      res.json(comment);
+    })
+    .catch((err) => {
+      res.status(404).send(err.message);
+    });
+});
+
+// READ
+app.get('/comments', (req, res) => {
+  Comment.findAll({
+    include: [Post],
+  })
+    .then((comment) => {
+      res.json(comment);
+    })
+    .catch((err) => {
+      res.status(404).send(err.message);
+    });
+});
+
+// READ
+app.get('/comments/:id', (req, res) => {
+  Comment.findOne({
+    where: { id: req.params.id },
+    include: [User],
+  })
+    .then((comment) => {
+      res.json(comment);
     })
     .catch((err) => {
       res.status(404).send(err.message);
