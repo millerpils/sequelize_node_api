@@ -5,7 +5,7 @@ const express = require('express');
 const app = express();
 const port = 8001;
 
-// pass req.body
+// support req.body
 app.use(express.json());
 
 /* 
@@ -18,6 +18,10 @@ connection
     //force: true, // drops the table
   })
   .then(() => {
+    /* 
+      You can bulkcreate users into the DB here.
+      Just add a JSON file and uncomment to run.
+    */
     // User.bulkCreate(_USERS)
     //   .then((users) => {
     //     console.log('Successfully added users.');
@@ -58,7 +62,7 @@ const Comment = connection.define('Comment', {
   comment: Sequelize.STRING,
 });
 
-// one-to-one relationship - foreign key UserId gets added to post table
+// one-to-one relationship
 Post.belongsTo(User);
 
 // one-to-one relationship
@@ -67,14 +71,14 @@ Comment.belongsTo(Post);
 // one-to-one relationship
 Comment.belongsTo(User);
 
-// one-to-many relationship - Posts array with UserId added to found user
+// one-to-many relationship
 User.hasMany(Post);
 
-// one-to-many relationship - Posts array with UserId added to found user
+// one-to-many relationship
 User.hasMany(Comment);
 
-// one-to-many relationship - Posts array with UserId added to found user
-Post.hasMany(Comment); // alias can be added
+// one-to-many relationship
+Post.hasMany(Comment);
 
 /*
   USERS
@@ -112,7 +116,7 @@ app.get('/users', (req, res) => {
 app.get('/users/:id', (req, res) => {
   User.findOne({
     where: { id: req.params.id },
-    include: [Comment],
+    include: [Post],
   })
     .then((user) => {
       res.json(user);
